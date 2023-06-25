@@ -60,29 +60,29 @@ app.get('/person/:id', async (req, res) => {
 })
 
 app.patch('/person/:id', async (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
 
-  const { name, salary, approved } = req.body
+  const { name, salary, approved } = req.body;
 
   const person = {
     name,
     salary,
     approved,
-  }
+  };
 
   try {
-    const updatedPerson = await Person.updateOne({ _id: id }, person)
+    const updatedPerson = await Person.updateOne({ _id: id }, person);
 
-    if (updatedPerson.matchedCount === 0) {
-      res.status(422).json({ message: 'Usuário não encontrado!' })
-      return
+    if (updatedPerson.nModified === 0) {
+      res.status(422).json({ message: 'Usuário não encontrado!' });
+      return;
     }
 
-    res.status(200).json(person)
+    res.status(200).json(person);
   } catch (error) {
-    res.status(500).json({ erro: error })
+    res.status(500).json({ erro: error });
   }
-})
+});
 
 app.delete('/person/:id', async (req, res) => {
   const id = req.params.id

@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import styled from "styled-components";
-import { FaTrash, FaEdit, FaCheck, FaTimes  } from "react-icons/fa";
+import { FaTrash, FaEdit, FaCheck, FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const Table = styled.table`
@@ -37,39 +37,59 @@ export const Td = styled.td`
   }
 `;
 
-const Grid = ({people}) => {
-    return (
-        <Table>
-            <Thead>
-                <Th>Nome</Th>
-                <Th>Salário</Th>
-                <Th>Aprovado</Th>
-                <Th></Th>
-                <Th></Th>
-            </Thead>
-            <Tbody>
-                {
-                    people.map(person  => {
-                        console.log('Lista de pessoas', people);
-                        return <Tr >
-                        <Td width="30%">{person.name}</Td>
-                        <Td width="30%">{person.salary}</Td>
-                        <Td width="30%">{person.approved ? <FaCheck /> : <FaTimes />}</Td>
-                        <Td alignCenter width="5%">
-                            <FaEdit />
-                        </Td>
-                        <Td alignCenter width="5%">
-                            <FaTrash />
-                        </Td>
-                        </Tr>
-                    })
+const Grid = ({ people, setPeople, setOnEdit }) => {
+  const handleEdit = async (person) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/person/${person._id}`);
+      const fullPerson = response.data;
+      setOnEdit(fullPerson);
+    } catch (error) {
+      // Tratar erros ao buscar o usuário completo
+      console.error(error);
+    }
+  };
+  const handleDelete = async (_id) => {
+    await axios
+      .delete("http://localhost:3000/person/" + _id)
+      .then(({ data }) => {
+        const newArray = people.filter((person) => person.id !== _id);
 
-                
-                }
-            </Tbody>
-        </Table>
+        setPeople(newArray);
+        toast.success(data);
+      })
+      .catch(({ data }) => toast.error(data));
 
-    );
+    setOnEdit(null);
+  };
+  return (
+    <Table>
+      <Thead>
+        <Th>Id</Th>
+        <Th>Nome</Th>
+        <Th>Salário</Th>
+        <Th>Aprovado</Th>
+        <Th></Th>
+        <Th></Th>
+      </Thead>
+      <Tbody>
+        {people.map((person) => (
+          <Tr key={person._id}>
+
+            <Td width="30%">{person.name}</Td>
+            <Td width="30%">{person.salary}</Td>
+            <Td width="30%">{person.approved ? <FaCheck /> : <FaTimes />}</Td>
+            <Td alignCenter width="5%">
+              <FaEdit onClick={() => handleEdit(person)} />
+            </Td>
+            <Td alignCenter width="5%">
+              <FaTrash onClick={() => handleDelete(person._id)} />
+            </Td>
+          </Tr>
+        ))}
+      </Tbody>
+    </Table>
+
+  );
 };
 
 export default Grid;

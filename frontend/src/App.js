@@ -20,32 +20,32 @@ const Container = styled.div`
 const Title = styled.h2``;
 function App() { 
   
-  //const[onEdit,setOnEdit] = useState(null);//variavel para edicao
-
-
+  const [onEdit, setOnEdit] = useState(null);//variavel para edicao
   const [people, setPeople] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/person");
-        setPeople(response.data);
-        console.log("dADOS: ",response.data);
-        
-      } catch (error) {
-        console.error("Erro ao buscar os dados:", error);
-      }
-    };
 
-    fetchData();
+  const getPeople = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/person/");
+      setPeople(response.data.sort((a, b) => (a.nome > b.nome ? 1 : -1)));
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  useEffect(() => {
+
+
+    getPeople();
   }, []);
+
+
 
   return (
     <div className="App">
       <Container>
         <Title>Usuários</Title>
-        <Form></Form>
-        <Grid people = {people}></Grid>
+        <Form onEdit={onEdit} setOnEdit={setOnEdit} getPeople={getPeople}></Form>
+        <Grid people = {people} setOnEdit={setOnEdit} setPeople={setPeople}></Grid>
       </Container>
      <ToastContainer autoClose={3001} position={toast.POSITION.BOTTOM_LEFT}/>
      <GlobalStyle/>
